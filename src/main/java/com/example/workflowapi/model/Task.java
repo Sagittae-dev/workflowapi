@@ -5,8 +5,10 @@ import com.example.workflowapi.enums.TaskStatus;
 import com.example.workflowapi.enums.TaskType;
 import com.example.workflowapi.validators.NotBlank;
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,15 +23,19 @@ public class Task {
     @NotBlank
     private String name;
     private TaskPriority priority;
+    @CreatedDate
     private LocalDateTime creationDate;
-    private TaskType tasktype;
+    @Enumerated(EnumType.STRING)
+    private TaskType taskType;
+    @NotBlank
     private String description;
     private LocalDateTime dueDate;
     private TaskStatus taskStatus;
     @ManyToOne
+    @NotBlank
     private User createdByUser;
-//    @ManyToOne
-//    private User assignedUser;
+    @ManyToOne
+    private User assignedUser;
     @OneToMany(cascade = CascadeType.PERSIST)
     private List<Comment> comments;
     private String attachment;

@@ -1,8 +1,8 @@
 package com.example.workflowapi.model;
 
-import com.example.workflowapi.validators.Email;
 import com.example.workflowapi.validators.NotBlank;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 
 @Entity
@@ -15,6 +15,5 @@ public class User {
     private String username;
     @Email
     private String email;
-    @Column(columnDefinition = "BOOLEAN")
     private Boolean isActive;
 }

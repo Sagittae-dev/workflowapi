@@ -1,5 +1,7 @@
 package com.example.workflowapi.services;
 
+import com.example.workflowapi.enums.TaskType;
+import com.example.workflowapi.exceptions.InvalidTasktypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.repositories.TaskRepository;
@@ -35,7 +37,14 @@ public class TaskService {
         return optionalTask.get();
     }
 
-    public Task saveTask(Task task){
+    public Task saveTask(Task task) throws InvalidTasktypeException {
+        //TODO extract all validation to different class TaskValidator
+        Optional<TaskType> validTaskType = TaskType.fromString(task.getTaskType().toString());
+        if(validTaskType.isPresent()){
+            task.setTaskType(validTaskType.get());
+        }else{
+            throw new InvalidTasktypeException("Invalid task type: " + task.getTaskType());
+        }
         return taskRepository.save(task);
     }
 

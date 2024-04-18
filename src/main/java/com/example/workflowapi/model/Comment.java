@@ -1,5 +1,6 @@
 package com.example.workflowapi.model;
 
+import com.example.workflowapi.validators.NotBlank;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -10,7 +11,9 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     private String content;
+    @ManyToOne
     private User author;
     private Integer likes;
     private Integer unlikes;
