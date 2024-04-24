@@ -1,7 +1,9 @@
 package com.example.workflowapi.services;
 
+import com.example.workflowapi.dto.TaskDTO;
+import com.example.workflowapi.dtomapper.TaskDTOMapper;
 import com.example.workflowapi.enums.TaskType;
-import com.example.workflowapi.exceptions.InvalidTasktypeException;
+import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.repositories.TaskRepository;
@@ -21,37 +23,40 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks(){
-        return taskRepository.findAll();
+    public List<TaskDTO> getAllTasks() {
+        List<TaskDTO> taskList = taskRepository.findAll().stream().map(TaskDTOMapper::mapToDTO).toList();
+        return taskList;
     }
 
 //    public List<Task> getTasksByAssignee(User user){
 //        return taskRepository.getTasksListByAssignee(user);
 //    }
 
-    public Task getTaskById(Long id) throws ResourceNotExistException {
+    public TaskDTO getTaskById(Long id) throws ResourceNotExistException {
         Optional<Task> optionalTask = taskRepository.findById(id);
-        if(optionalTask.isEmpty()){
+        if (optionalTask.isEmpty()) {
             throwResourceNotFoundException(id);
         }
-        return optionalTask.get();
+        Task task = optionalTask.get();
+        return TaskDTOMapper.mapToDTO(task);
     }
 
-    public Task saveTask(Task task) throws InvalidTasktypeException {
+    public TaskDTO saveTask(Task task) throws InvalidTaskTypeException {
         //TODO extract all validation to different class TaskValidator
+
         Optional<TaskType> validTaskType = TaskType.fromString(task.getTaskType().toString());
-        if(validTaskType.isPresent()){
+        if (validTaskType.isPresent()) {
             task.setTaskType(validTaskType.get());
-        }else{
-            throw new InvalidTasktypeException("Invalid task type: " + task.getTaskType());
+        } else {
+            throw new InvalidTaskTypeException("Invalid task type: " + task.getTaskType());
         }
-        return taskRepository.save(task);
+        return TaskDTOMapper.mapToDTO(taskRepository.save(task));
     }
 
     public Task updateTask(Task task) throws ResourceNotExistException {
         long taskId = task.getId();
         Optional<Task> taskToEdit = taskRepository.findById(taskId);
-        if(taskToEdit.isEmpty()){
+        if (taskToEdit.isEmpty()) {
             throwResourceNotFoundException(taskId);
         }
         return taskRepository.save(task);

@@ -1,8 +1,7 @@
 package com.example.workflowapi.services;
 
 import com.example.workflowapi.exceptions.ResourceNotExistException;
-import com.example.workflowapi.model.Task;
-import com.example.workflowapi.model.User;
+import com.example.workflowapi.model.WorkflowUser;
 import com.example.workflowapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,17 +19,27 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUsers(){
+    public List<WorkflowUser> getAllUsers() {
         return userRepository.findAll();
     }
-    public User getUserById(Long id) throws ResourceNotExistException {
-        Optional<User> optionalUser = userRepository.findById(id);
-        if(optionalUser.isEmpty()){
-            throw new ResourceNotExistException("User with id: " +id+ " doesn't exist");
+
+    public WorkflowUser getUserById(Long id) throws ResourceNotExistException {
+        Optional<WorkflowUser> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new ResourceNotExistException("User with id: " + id + " doesn't exist");
         }
         return optionalUser.get();
     }
-    public User addUser(User user){
-        return userRepository.save(user);
+
+    public WorkflowUser addUser(WorkflowUser workflowUser) {
+        return userRepository.save(workflowUser);
+    }
+
+    public WorkflowUser findUserByUsername(String username) throws ResourceNotExistException {
+        Optional<WorkflowUser> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotExistException("There is no user with this username");
+        }
+        return userOptional.get();
     }
 }

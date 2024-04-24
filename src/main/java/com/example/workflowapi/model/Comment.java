@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+
 @Entity
 @Data
 public class Comment {
@@ -14,7 +15,9 @@ public class Comment {
     @NotBlank
     private String content;
     @ManyToOne
-    private User author;
+    private WorkflowUser author;
+    @ManyToOne
+    private Task task;
     private Integer likes;
     private Integer unlikes;
     private LocalDate creationDate;

@@ -1,6 +1,7 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.exceptions.InvalidTasktypeException;
+import com.example.workflowapi.dto.TaskDTO;
+import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.services.TaskService;
@@ -22,24 +23,28 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task){
+    public ResponseEntity<TaskDTO> createTask(@RequestBody Task task) {
         try {
-            Task createdTask = taskService.saveTask(task);
+            TaskDTO createdTask = taskService.saveTask(task);
             return ResponseEntity.ok(createdTask);
-        } catch(InvalidTasktypeException ite){
+        } catch (InvalidTaskTypeException ite) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) throws ResourceNotExistException {
-        Task task = taskService.getTaskById(id);
-        return ResponseEntity.ok(task);
+    public ResponseEntity<TaskDTO> getTaskById(@PathVariable Long id) {
+        try {
+            TaskDTO task = taskService.getTaskById(id);
+            return ResponseEntity.ok(task);
+        } catch (ResourceNotExistException re) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks(){
-        List<Task> tasks = taskService.getAllTasks();
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
+        List<TaskDTO> tasks = taskService.getAllTasks();
         return ResponseEntity.ok(tasks);
     }
 }
