@@ -3,6 +3,7 @@ package com.example.workflowapi.controllers;
 import com.example.workflowapi.dto.TaskDTO;
 import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +24,12 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDTO> createTask(@RequestBody Task task) {
+    public ResponseEntity<?> createTask(@RequestBody Task task) {
         try {
             TaskDTO createdTask = taskService.saveTask(task);
             return ResponseEntity.ok(createdTask);
-        } catch (InvalidTaskTypeException ite) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        } catch (ValidationException ve) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ve.getErrors());
         }
     }
 

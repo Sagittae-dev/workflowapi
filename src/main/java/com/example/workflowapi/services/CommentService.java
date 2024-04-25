@@ -59,6 +59,7 @@ public class CommentService {
         comment.setTask(task);
         comment.setContent(content);
         comment.setAuthor(workflowUser);
+        comment.setTask(task);
         comment.setLikes(0);
         comment.setUnlikes(0);
         comment.setCreationDate(LocalDate.now());

@@ -9,6 +9,7 @@ public class CommentDTOMapper {
         dto.setId(comment.getId());
         dto.setContent(comment.getContent());
         dto.setAuthor(comment.getAuthor() != null ? comment.getAuthor().getUsername() : null);
+        dto.setTaskId(comment.getTask() != null ? comment.getTask().getId() : null);
         dto.setLikes(comment.getLikes());
         dto.setUnlikes(comment.getUnlikes());
         dto.setCreationDate(comment.getCreationDate());

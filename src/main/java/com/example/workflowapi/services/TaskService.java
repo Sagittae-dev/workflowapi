@@ -2,11 +2,12 @@ package com.example.workflowapi.services;
 
 import com.example.workflowapi.dto.TaskDTO;
 import com.example.workflowapi.dtomapper.TaskDTOMapper;
-import com.example.workflowapi.enums.TaskType;
-import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.repositories.TaskRepository;
+import com.example.workflowapi.validators.TaskValidator;
+import com.example.workflowapi.validators.ValidationResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +18,12 @@ import java.util.Optional;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final TaskValidator taskValidator;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, TaskValidator taskValidator) {
         this.taskRepository = taskRepository;
+        this.taskValidator = taskValidator;
     }
 
     public List<TaskDTO> getAllTasks() {
@@ -41,14 +44,10 @@ public class TaskService {
         return TaskDTOMapper.mapToDTO(task);
     }
 
-    public TaskDTO saveTask(Task task) throws InvalidTaskTypeException {
-        //TODO extract all validation to different class TaskValidator
-
-        Optional<TaskType> validTaskType = TaskType.fromString(task.getTaskType().toString());
-        if (validTaskType.isPresent()) {
-            task.setTaskType(validTaskType.get());
-        } else {
-            throw new InvalidTaskTypeException("Invalid task type: " + task.getTaskType());
+    public TaskDTO saveTask(Task task) throws ValidationException {
+        ValidationResult validationResult = taskValidator.validate(task);
+        if (!validationResult.isValid()) {
+            throw new ValidationException(validationResult.getErrors());
         }
         return TaskDTOMapper.mapToDTO(taskRepository.save(task));
     }
