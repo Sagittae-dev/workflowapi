@@ -1,7 +1,6 @@
 package com.example.workflowapi.services;
 
 import com.example.workflowapi.dto.CommentDTO;
-import com.example.workflowapi.dto.TaskDTO;
 import com.example.workflowapi.dtomapper.CommentDTOMapper;
 import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
@@ -11,6 +10,7 @@ import com.example.workflowapi.model.Task;
 import com.example.workflowapi.model.WorkflowUser;
 import com.example.workflowapi.repositories.CommentRepository;
 import com.example.workflowapi.repositories.TaskRepository;
+import com.example.workflowapi.repositories.UserRepository;
 import com.example.workflowapi.validators.CommentValidator;
 import com.example.workflowapi.validators.ValidationResult;
 import com.example.workflowapi.validators.Validator;
@@ -26,21 +26,18 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final TaskRepository taskRepository;
-    private final TaskService taskService;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public CommentService(CommentRepository commentRepository, TaskRepository taskRepository, TaskService taskService, UserService userService) {
+    public CommentService(CommentRepository commentRepository, TaskRepository taskRepository, UserRepository userRepository) {
         this.commentRepository = commentRepository;
         this.taskRepository = taskRepository;
-        this.taskService = taskService;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public List<CommentDTO> getAllCommentsForTask(Long taskId) throws ResourceNotExistException {
-        TaskDTO task = taskService.getTaskById(taskId);
-
-        return task.getComments();
+        Task task = taskRepository.findById(taskId).orElseThrow();
+        return task.getComments().stream().map(CommentDTOMapper::mapToDTO).toList();
     }
 
     public Comment getCommentById(Long id) throws ResourceNotExistException {
@@ -52,9 +49,12 @@ public class CommentService {
     }
 
     public CommentDTO addCommentToTask(Long taskId, String username, String content) throws ValidationException, ResourceNotExistException, InvalidTaskTypeException {
-        WorkflowUser workflowUser = userService.findUserByUsername(username);
+        WorkflowUser workflowUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotExistException("User with username: " + username + " doesn't exist"));
 
-        Task task = taskRepository.findById(taskId).orElseThrow(() -> new ResourceNotExistException("No task found for id: " + taskId));
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotExistException("No task found for id: " + taskId));
+
         Comment comment = new Comment();
         comment.setTask(task);
         comment.setContent(content);
@@ -69,7 +69,6 @@ public class CommentService {
             throw new ValidationException(result.getErrors());
         }
         task.getComments().add(comment);
-//        taskService.saveTask(task);
 
         return CommentDTOMapper.mapToDTO(commentRepository.save(comment));
     }

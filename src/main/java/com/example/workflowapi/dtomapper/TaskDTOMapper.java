@@ -18,7 +18,7 @@ public class TaskDTOMapper {
         dto.setTaskStatus(task.getTaskStatus());
         dto.setCreatedBy(task.getCreatedBy() != null ? task.getCreatedBy().getUsername() : null);
         dto.setAssignedTo(task.getAssignedTo() != null ? task.getAssignedTo().getUsername() : null);
-        dto.setComments(task.getComments().stream().map(CommentDTOMapper::mapToDTO).collect(Collectors.toList()));
+        dto.setComments(task.getComments() != null ? task.getComments().stream().map(CommentDTOMapper::mapToDTO).collect(Collectors.toList()) : null);
         dto.setAttachment(task.getAttachment());
         return dto;
     }
