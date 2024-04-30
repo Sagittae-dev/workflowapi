@@ -1,7 +1,6 @@
 package com.example.workflowapi.controllers;
 
 import com.example.workflowapi.dto.TaskDTO;
-import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;

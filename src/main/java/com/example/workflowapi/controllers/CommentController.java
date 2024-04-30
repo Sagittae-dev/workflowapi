@@ -1,7 +1,6 @@
 package com.example.workflowapi.controllers;
 
 import com.example.workflowapi.dto.CommentDTO;
-import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.services.CommentService;
@@ -49,8 +48,6 @@ public class CommentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (ValidationException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build(); // TODO write proper logic to adding comments
-        } catch (InvalidTaskTypeException ite) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 
     }

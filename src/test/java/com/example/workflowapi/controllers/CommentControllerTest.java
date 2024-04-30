@@ -1,7 +1,6 @@
 package com.example.workflowapi.controllers;
 
 import com.example.workflowapi.dto.CommentDTO;
-import com.example.workflowapi.exceptions.InvalidTaskTypeException;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.services.CommentService;
@@ -14,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -71,7 +71,7 @@ class CommentControllerTest {
     }
 
     @Test
-    void addCommentToTask_Success() throws ValidationException, ResourceNotExistException, InvalidTaskTypeException {
+    void addCommentToTask_Success() throws ValidationException, ResourceNotExistException {
         CommentDTO comment = new CommentDTO();
         when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenReturn(comment);
         ResponseEntity<CommentDTO> response = commentController.addCommentToTask(1L, "abc", "abcd");
@@ -80,7 +80,7 @@ class CommentControllerTest {
     }
 
     @Test
-    void addCommentToTask_ResourceNotExist() throws ValidationException, ResourceNotExistException, InvalidTaskTypeException {
+    void addCommentToTask_ResourceNotExist() throws ValidationException, ResourceNotExistException {
         when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenThrow(new ResourceNotExistException("abc"));
         ResponseEntity<CommentDTO> response = commentController.addCommentToTask(1L, "abc", "abcd");
 
@@ -88,13 +88,11 @@ class CommentControllerTest {
     }
 
     @Test
-    void testAddCommentToTask_InvalidTaskTypeException() throws ValidationException, ResourceNotExistException, InvalidTaskTypeException {
-        when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenThrow(InvalidTaskTypeException.class);
-        CommentController controller = new CommentController(commentService);
+    void addCommentToTask_NotValid() throws ValidationException, ResourceNotExistException {
+        when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenThrow(new ValidationException(Collections.singletonList("abc")));
+        ResponseEntity<CommentDTO> response = commentController.addCommentToTask(1L, "abc", "abcd");
 
-        ResponseEntity<CommentDTO> response = controller.addCommentToTask(1L, "username", "content");
-
-        assertEquals(HttpStatus.NOT_ACCEPTABLE, response.getStatusCode());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
     }
 
 }
