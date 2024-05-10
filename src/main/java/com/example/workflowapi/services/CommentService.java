@@ -1,7 +1,5 @@
 package com.example.workflowapi.services;
 
-import com.example.workflowapi.dto.CommentDTO;
-import com.example.workflowapi.dtomapper.CommentDTOMapper;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Comment;
@@ -35,9 +33,10 @@ public class CommentService {
         this.commentValidator = commentValidator;
     }
 
-    public List<CommentDTO> getAllCommentsForTask(Long taskId) throws ResourceNotExistException {
+    public List<Comment> getAllCommentsForTask(Long taskId) throws ResourceNotExistException {
         Task task = taskRepository.findById(taskId).orElseThrow();
-        return task.getComments().stream().map(CommentDTOMapper::mapToDTO).toList();
+//        return task.getComments().stream().map(CommentDTOMapper::mapToDTO).toList();
+        return task.getComments();
     }
 
     public Comment getCommentById(Long id) throws ResourceNotExistException {
@@ -48,7 +47,7 @@ public class CommentService {
         return comment.get();
     }
 
-    public CommentDTO addCommentToTask(Long taskId, String username, String content) throws ValidationException, ResourceNotExistException {
+    public Comment addCommentToTask(Long taskId, String username, String content) throws ValidationException, ResourceNotExistException {
         WorkflowUser workflowUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotExistException("User with username: " + username + " doesn't exist"));
 
@@ -56,10 +55,9 @@ public class CommentService {
                 .orElseThrow(() -> new ResourceNotExistException("No task found for id: " + taskId));
 
         Comment comment = new Comment();
-        comment.setTask(task);
+        comment.setTaskId(taskId);
         comment.setContent(content);
         comment.setAuthor(workflowUser);
-        comment.setTask(task);
         comment.setLikes(0);
         comment.setUnlikes(0);
         comment.setCreationDate(LocalDate.now());
@@ -69,13 +67,10 @@ public class CommentService {
         }
         task.getComments().add(comment);
 
-        return CommentDTOMapper.mapToDTO(commentRepository.save(comment));
+        return commentRepository.save(comment);
     }
 
-    public List<CommentDTO> searchCommentsByContent(String searchString) {
-        return commentRepository.findByContentContainingIgnoreCase(searchString)
-                .stream()
-                .map(CommentDTOMapper::mapToDTO)
-                .toList();
+    public List<Comment> searchCommentsByContent(String searchString) {
+        return commentRepository.findByContentContainingIgnoreCase(searchString);
     }
 }

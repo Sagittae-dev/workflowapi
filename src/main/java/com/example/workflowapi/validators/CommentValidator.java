@@ -1,12 +1,14 @@
 package com.example.workflowapi.validators;
 
 import com.example.workflowapi.model.Comment;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class CommentValidator implements Validator<Comment> {
     @Override
     public ValidationResult validate(Comment comment) {

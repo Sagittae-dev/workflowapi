@@ -5,6 +5,7 @@ import com.example.workflowapi.model.Task;
 
 import java.util.stream.Collectors;
 
+@Deprecated
 public class TaskDTOMapper {
     public static TaskDTO mapToDTO(Task task) {
         TaskDTO dto = new TaskDTO();

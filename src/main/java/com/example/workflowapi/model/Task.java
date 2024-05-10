@@ -31,7 +31,7 @@ public class Task {
     private WorkflowUser createdBy;
     @ManyToOne
     private WorkflowUser assignedTo;
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private List<Comment> comments;
     private String attachment;
 }

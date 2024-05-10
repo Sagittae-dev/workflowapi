@@ -1,8 +1,8 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.dto.CommentDTO;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
+import com.example.workflowapi.model.Comment;
 import com.example.workflowapi.services.CommentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,10 +39,10 @@ class CommentControllerTest {
     @Test
     void getAllCommentsForTask_Success() throws ResourceNotExistException {
         Long taskId = 1L;
-        List<CommentDTO> comments = List.of(new CommentDTO(), new CommentDTO());
+        List<Comment> comments = List.of(new Comment(), new Comment());
         when(commentService.getAllCommentsForTask(taskId)).thenReturn(comments);
 
-        ResponseEntity<List<CommentDTO>> response = commentController.getAllCommentsForTask(taskId);
+        ResponseEntity<List<Comment>> response = commentController.getAllCommentsForTask(taskId);
 
         assertEquals(2, Objects.requireNonNull(response.getBody()).size());
         assertEquals(comments, response.getBody());
@@ -54,7 +54,7 @@ class CommentControllerTest {
         Long taskId = 1L;
         when(commentService.getAllCommentsForTask(taskId)).thenThrow(new ResourceNotExistException("No task with id: " + taskId));
 
-        ResponseEntity<List<CommentDTO>> response = commentController.getAllCommentsForTask(taskId);
+        ResponseEntity<List<Comment>> response = commentController.getAllCommentsForTask(taskId);
 
         assertTrue(Objects.requireNonNull(response.getBody()).isEmpty());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -62,9 +62,9 @@ class CommentControllerTest {
 
     @Test
     void searchCommentsByContent_Success() {
-        List<CommentDTO> comments = List.of(new CommentDTO(), new CommentDTO());
+        List<Comment> comments = List.of(new Comment(), new Comment());
         when(commentService.searchCommentsByContent("abc")).thenReturn(comments);
-        ResponseEntity<List<CommentDTO>> response = commentController.searchCommentsByContent("abc");
+        ResponseEntity<List<Comment>> response = commentController.searchCommentsByContent("abc");
 
         assertEquals(2, Objects.requireNonNull(response.getBody()).size());
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -72,9 +72,9 @@ class CommentControllerTest {
 
     @Test
     void addCommentToTask_Success() throws ValidationException, ResourceNotExistException {
-        CommentDTO comment = new CommentDTO();
+        Comment comment = new Comment();
         when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenReturn(comment);
-        ResponseEntity<CommentDTO> response = commentController.addCommentToTask(1L, "abc", "abcd");
+        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, "abc", "abcd");
         assertEquals(comment, response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
@@ -82,7 +82,7 @@ class CommentControllerTest {
     @Test
     void addCommentToTask_ResourceNotExist() throws ValidationException, ResourceNotExistException {
         when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenThrow(new ResourceNotExistException("abc"));
-        ResponseEntity<CommentDTO> response = commentController.addCommentToTask(1L, "abc", "abcd");
+        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, "abc", "abcd");
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
@@ -90,7 +90,7 @@ class CommentControllerTest {
     @Test
     void addCommentToTask_NotValid() throws ValidationException, ResourceNotExistException {
         when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenThrow(new ValidationException(Collections.singletonList("abc")));
-        ResponseEntity<CommentDTO> response = commentController.addCommentToTask(1L, "abc", "abcd");
+        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, "abc", "abcd");
 
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
     }

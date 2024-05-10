@@ -26,9 +26,8 @@ public class TaskService {
         this.taskValidator = taskValidator;
     }
 
-    public List<TaskDTO> getAllTasks() {
-        List<TaskDTO> taskList = taskRepository.findAll().stream().map(TaskDTOMapper::mapToDTO).toList();
-        return taskList;
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
     }
 
 //    public List<Task> getTasksByAssignee(User user){

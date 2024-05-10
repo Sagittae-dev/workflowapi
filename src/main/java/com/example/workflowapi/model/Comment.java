@@ -16,8 +16,7 @@ public class Comment {
     private String content;
     @ManyToOne
     private WorkflowUser author;
-    @ManyToOne
-    private Task task;
+    private Long taskId;
     private Integer likes;
     private Integer unlikes;
     private LocalDate creationDate;

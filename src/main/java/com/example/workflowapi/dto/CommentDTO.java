@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-
+@Deprecated
 @Getter
 @Setter
 public class CommentDTO {

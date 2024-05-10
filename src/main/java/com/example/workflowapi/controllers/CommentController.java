@@ -1,8 +1,8 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.dto.CommentDTO;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
+import com.example.workflowapi.model.Comment;
 import com.example.workflowapi.services.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,9 +24,9 @@ public class CommentController {
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<List<CommentDTO>> getAllCommentsForTask(@PathVariable Long taskId) {
+    public ResponseEntity<List<Comment>> getAllCommentsForTask(@PathVariable Long taskId) {
         try {
-            List<CommentDTO> commentsList = commentService.getAllCommentsForTask(taskId);
+            List<Comment> commentsList = commentService.getAllCommentsForTask(taskId);
             return ResponseEntity.ok(commentsList);
         } catch (ResourceNotExistException re) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
@@ -34,15 +34,15 @@ public class CommentController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<CommentDTO>> searchCommentsByContent(@RequestParam String searchString) {
-        List<CommentDTO> commentsList = commentService.searchCommentsByContent(searchString);
+    public ResponseEntity<List<Comment>> searchCommentsByContent(@RequestParam String searchString) {
+        List<Comment> commentsList = commentService.searchCommentsByContent(searchString);
         return ResponseEntity.ok(commentsList);
     }
 
     @PostMapping("/{taskId}")
-    public ResponseEntity<CommentDTO> addCommentToTask(@PathVariable Long taskId, @RequestParam String username, @RequestBody String content) {
+    public ResponseEntity<Comment> addCommentToTask(@PathVariable Long taskId, @RequestParam String username, @RequestBody String content) {
         try {
-            CommentDTO comment = commentService.addCommentToTask(taskId, username, content);
+            Comment comment = commentService.addCommentToTask(taskId, username, content);
             return ResponseEntity.ok(comment);
         } catch (ResourceNotExistException re) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
