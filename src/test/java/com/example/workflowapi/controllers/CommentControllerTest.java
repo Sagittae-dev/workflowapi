@@ -15,9 +15,11 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -37,7 +39,7 @@ class CommentControllerTest {
     }
 
     @Test
-    void getAllCommentsForTask_Success() throws ResourceNotExistException {
+    void getAllCommentsForTask_Success() {
         Long taskId = 1L;
         List<Comment> comments = List.of(new Comment(), new Comment());
         when(commentService.getAllCommentsForTask(taskId)).thenReturn(comments);
@@ -50,14 +52,13 @@ class CommentControllerTest {
     }
 
     @Test
-    void getAllCommentsForTask_NotFound() throws ResourceNotExistException {
+    void getAllCommentsForTask_NotFound() {
         Long taskId = 1L;
-        when(commentService.getAllCommentsForTask(taskId)).thenThrow(new ResourceNotExistException("No task with id: " + taskId));
+        when(commentService.getAllCommentsForTask(taskId)).thenReturn(Collections.emptyList());
 
         ResponseEntity<List<Comment>> response = commentController.getAllCommentsForTask(taskId);
 
         assertTrue(Objects.requireNonNull(response.getBody()).isEmpty());
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
@@ -94,5 +95,4 @@ class CommentControllerTest {
 
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
     }
-
 }

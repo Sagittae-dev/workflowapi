@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -33,10 +35,13 @@ public class CommentService {
         this.commentValidator = commentValidator;
     }
 
-    public List<Comment> getAllCommentsForTask(Long taskId) throws ResourceNotExistException {
-        Task task = taskRepository.findById(taskId).orElseThrow();
-//        return task.getComments().stream().map(CommentDTOMapper::mapToDTO).toList();
-        return task.getComments();
+    public List<Comment> getAllCommentsForTask(Long taskId) {
+        try {
+            Task task = taskRepository.findById(taskId).orElseThrow();
+            return task.getComments();
+        } catch (NoSuchElementException re) {
+            return Collections.emptyList();
+        }
     }
 
     public Comment getCommentById(Long id) throws ResourceNotExistException {
@@ -54,13 +59,8 @@ public class CommentService {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotExistException("No task found for id: " + taskId));
 
-        Comment comment = new Comment();
-        comment.setTaskId(taskId);
-        comment.setContent(content);
-        comment.setAuthor(workflowUser);
-        comment.setLikes(0);
-        comment.setUnlikes(0);
-        comment.setCreationDate(LocalDate.now());
+        Comment comment = createComment(taskId, workflowUser, content);
+
         ValidationResult result = commentValidator.validate(comment);
         if (!result.isValid()) {
             throw new ValidationException(result.getErrors());
@@ -72,5 +72,16 @@ public class CommentService {
 
     public List<Comment> searchCommentsByContent(String searchString) {
         return commentRepository.findByContentContainingIgnoreCase(searchString);
+    }
+
+    private Comment createComment(Long taskId, WorkflowUser workflowUser, String content) {
+        Comment comment = new Comment();
+        comment.setTaskId(taskId);
+        comment.setContent(content);
+        comment.setAuthor(workflowUser);
+        comment.setLikes(0);
+        comment.setUnlikes(0);
+        comment.setCreationDate(LocalDate.now());
+        return comment;
     }
 }

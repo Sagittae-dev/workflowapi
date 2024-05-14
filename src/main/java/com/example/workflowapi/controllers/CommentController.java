@@ -14,7 +14,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/comments")
-public class CommentController {
+public class
+CommentController {
 
     private final CommentService commentService;
 
@@ -25,12 +26,8 @@ public class CommentController {
 
     @GetMapping("/{taskId}")
     public ResponseEntity<List<Comment>> getAllCommentsForTask(@PathVariable Long taskId) {
-        try {
             List<Comment> commentsList = commentService.getAllCommentsForTask(taskId);
             return ResponseEntity.ok(commentsList);
-        } catch (ResourceNotExistException re) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
-        }
     }
 
     @GetMapping("/search")

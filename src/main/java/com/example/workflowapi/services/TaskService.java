@@ -1,7 +1,5 @@
 package com.example.workflowapi.services;
 
-import com.example.workflowapi.dto.TaskDTO;
-import com.example.workflowapi.dtomapper.TaskDTOMapper;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
@@ -34,21 +32,20 @@ public class TaskService {
 //        return taskRepository.getTasksListByAssignee(user);
 //    }
 
-    public TaskDTO getTaskById(Long id) throws ResourceNotExistException {
+    public Task getTaskById(Long id) throws ResourceNotExistException {
         Optional<Task> optionalTask = taskRepository.findById(id);
         if (optionalTask.isEmpty()) {
             throwResourceNotFoundException(id);
         }
-        Task task = optionalTask.get();
-        return TaskDTOMapper.mapToDTO(task);
+        return optionalTask.get();
     }
 
-    public TaskDTO saveTask(Task task) throws ValidationException {
+    public Task saveTask(Task task) throws ValidationException {
         ValidationResult validationResult = taskValidator.validate(task);
         if (!validationResult.isValid()) {
             throw new ValidationException(validationResult.getErrors());
         }
-        return TaskDTOMapper.mapToDTO(taskRepository.save(task));
+        return taskRepository.save(task);
     }
 
     public Task updateTask(Task task) throws ResourceNotExistException {

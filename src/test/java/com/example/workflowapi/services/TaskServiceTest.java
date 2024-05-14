@@ -1,6 +1,5 @@
 package com.example.workflowapi.services;
 
-import com.example.workflowapi.dto.TaskDTO;
 import com.example.workflowapi.enums.TaskType;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
@@ -38,28 +37,28 @@ class TaskServiceTest {
 
     @Test
     void getAllTasks_MultipleTasks() {
-//        List<Task> tasks = List.of(new Task(), new Task());
-//        when(taskRepositoryMock.findAll()).thenReturn(tasks);
-//        List<TaskDTO> expectedTasksDTO = taskService.getAllTasks();
-//        assertEquals(2, expectedTasksDTO.size());
+        List<Task> tasks = List.of(new Task(), new Task());
+        when(taskRepositoryMock.findAll()).thenReturn(tasks);
+        List<Task> expectedTasks = taskService.getAllTasks();
+        assertEquals(2, expectedTasks.size());
     }
 
     @Test
     void getAllTasks_OneTask() {
-//        List<Task> tasks = List.of(new Task());
-//        when(taskRepositoryMock.findAll()).thenReturn(tasks);
-//        List<TaskDTO> expectedTasksDTO = taskService.getAllTasks();
-//        assertNotNull(expectedTasksDTO);
-//        assertEquals(1, expectedTasksDTO.size());
+        List<Task> tasks = List.of(new Task());
+        when(taskRepositoryMock.findAll()).thenReturn(tasks);
+        List<Task> expectedTasks = taskService.getAllTasks();
+        assertNotNull(expectedTasks);
+        assertEquals(1, expectedTasks.size());
     }
 
     @Test
     void getAllTasks_NoTasks() {
-//        List<Task> tasks = Collections.emptyList();
-//        when(taskRepositoryMock.findAll()).thenReturn(tasks);
-//        List<TaskDTO> expectedTasksDTO = taskService.getAllTasks();
-//        assertNotNull(expectedTasksDTO);
-//        assertTrue(expectedTasksDTO.isEmpty());
+        List<Task> tasks = Collections.emptyList();
+        when(taskRepositoryMock.findAll()).thenReturn(tasks);
+        List<Task> expectedTasks = taskService.getAllTasks();
+        assertNotNull(expectedTasks);
+        assertTrue(expectedTasks.isEmpty());
     }
 
     @Test
@@ -73,18 +72,19 @@ class TaskServiceTest {
 
         when(taskRepositoryMock.findById(taskId)).thenReturn(Optional.of(task));
 
-        TaskDTO retrievedTaskDTO = taskService.getTaskById(taskId);
-        assertNotNull(retrievedTaskDTO);
-        assertEquals(task.getId(), retrievedTaskDTO.getId());
-        assertEquals(task.getName(), retrievedTaskDTO.getName());
-        assertEquals(task.getTaskType(), retrievedTaskDTO.getTaskType());
-        assertEquals(task.getCreationDate(), retrievedTaskDTO.getCreationDate());
+        Task retrievedTask = taskService.getTaskById(taskId);
+        assertNotNull(retrievedTask);
+        assertEquals(task.getId(), retrievedTask.getId());
+        assertEquals(task.getName(), retrievedTask.getName());
+        assertEquals(task.getTaskType(), retrievedTask.getTaskType());
+        assertEquals(task.getCreationDate(), retrievedTask.getCreationDate());
     }
+
     @Test
-    void getTaskById_ResourceNotExist(){
+    void getTaskById_ResourceNotExist() {
         when(taskRepositoryMock.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotExistException.class,() -> taskService.getTaskById(1L));
+        assertThrows(ResourceNotExistException.class, () -> taskService.getTaskById(1L));
     }
 
 
@@ -102,11 +102,11 @@ class TaskServiceTest {
 
         when(taskRepositoryMock.save(task)).thenReturn(task);
 
-        TaskDTO savedTaskDTO = taskService.saveTask(task);
-        assertEquals(task.getId(), savedTaskDTO.getId());
-        assertEquals(task.getName(), savedTaskDTO.getName());
-        assertEquals(task.getTaskType(), savedTaskDTO.getTaskType());
-        assertEquals(task.getCreationDate(), savedTaskDTO.getCreationDate());
+        Task savedTask = taskService.saveTask(task);
+        assertEquals(task.getId(), savedTask.getId());
+        assertEquals(task.getName(), savedTask.getName());
+        assertEquals(task.getTaskType(), savedTask.getTaskType());
+        assertEquals(task.getCreationDate(), savedTask.getCreationDate());
     }
 
     @Test

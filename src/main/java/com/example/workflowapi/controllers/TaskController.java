@@ -1,6 +1,5 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.dto.TaskDTO;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
@@ -25,7 +24,7 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<?> createTask(@RequestBody Task task) {
         try {
-            TaskDTO createdTask = taskService.saveTask(task);
+            Task createdTask = taskService.saveTask(task);
             return ResponseEntity.ok(createdTask);
         } catch (ValidationException ve) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ve.getErrors());
@@ -33,9 +32,9 @@ public class TaskController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TaskDTO> getTaskById(@PathVariable Long id) {
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
         try {
-            TaskDTO task = taskService.getTaskById(id);
+            Task task = taskService.getTaskById(id);
             return ResponseEntity.ok(task);
         } catch (ResourceNotExistException re) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
