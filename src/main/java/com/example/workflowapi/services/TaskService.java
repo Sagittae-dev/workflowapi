@@ -3,9 +3,11 @@ package com.example.workflowapi.services;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
+import com.example.workflowapi.repositories.CommentRepository;
 import com.example.workflowapi.repositories.TaskRepository;
 import com.example.workflowapi.validators.TaskValidator;
 import com.example.workflowapi.validators.ValidationResult;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +19,13 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final TaskValidator taskValidator;
+    private final CommentRepository commentRepository;
 
     @Autowired
-    public TaskService(TaskRepository taskRepository, TaskValidator taskValidator) {
+    public TaskService(TaskRepository taskRepository, TaskValidator taskValidator, CommentRepository commentRepository) {
         this.taskRepository = taskRepository;
         this.taskValidator = taskValidator;
+        this.commentRepository = commentRepository;
     }
 
     public List<Task> getAllTasks() {
@@ -55,6 +59,12 @@ public class TaskService {
             throwResourceNotFoundException(taskId);
         }
         return taskRepository.save(task);
+    }
+
+    @Transactional
+    public void removeTask(Long taskId) {
+        taskRepository.deleteById(taskId);
+        commentRepository.deleteByTaskId(taskId);
     }
 
     private void throwResourceNotFoundException(Long id) throws ResourceNotExistException {

@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findByContentContainingIgnoreCase(String searchString);
+    void deleteByTaskId(Long taskId);
 }

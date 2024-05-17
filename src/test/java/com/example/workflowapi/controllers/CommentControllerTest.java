@@ -73,24 +73,24 @@ class CommentControllerTest {
     @Test
     void addCommentToTask_Success() throws ValidationException, ResourceNotExistException {
         Comment comment = new Comment();
-        when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenReturn(comment);
-        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, "abc", "abcd");
+        when(commentService.addCommentToTask(anyLong(), anyLong(), anyString())).thenReturn(comment);
+        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, 2L, "abcd");
         assertEquals(comment, response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
     void addCommentToTask_ResourceNotExist() throws ValidationException, ResourceNotExistException {
-        when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenThrow(new ResourceNotExistException("abc"));
-        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, "abc", "abcd");
+        when(commentService.addCommentToTask(anyLong(), anyLong(), anyString())).thenThrow(new ResourceNotExistException("abc"));
+        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, 2L, "abcd");
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
     void addCommentToTask_NotValid() throws ValidationException, ResourceNotExistException {
-        when(commentService.addCommentToTask(anyLong(), anyString(), anyString())).thenThrow(new ValidationException(Collections.singletonList("abc")));
-        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, "abc", "abcd");
+        when(commentService.addCommentToTask(anyLong(), anyLong(), anyString())).thenThrow(new ValidationException(Collections.singletonList("abc")));
+        ResponseEntity<Comment> response = commentController.addCommentToTask(1L, 2L, "abcd");
 
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.getStatusCode());
     }

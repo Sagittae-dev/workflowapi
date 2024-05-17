@@ -52,9 +52,9 @@ public class CommentService {
         return comment.get();
     }
 
-    public Comment addCommentToTask(Long taskId, String username, String content) throws ValidationException, ResourceNotExistException {
-        WorkflowUser workflowUser = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotExistException("User with username: " + username + " doesn't exist"));
+    public Comment addCommentToTask(Long taskId, Long userId, String content) throws ValidationException, ResourceNotExistException {
+        WorkflowUser workflowUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotExistException("User with id: " + userId + " doesn't exist"));
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotExistException("No task found for id: " + taskId));

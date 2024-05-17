@@ -4,6 +4,7 @@ import com.example.workflowapi.enums.TaskType;
 import com.example.workflowapi.exceptions.ResourceNotExistException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
+import com.example.workflowapi.repositories.CommentRepository;
 import com.example.workflowapi.repositories.TaskRepository;
 import com.example.workflowapi.validators.TaskValidator;
 import com.example.workflowapi.validators.ValidationResult;
@@ -25,6 +26,8 @@ class TaskServiceTest {
     @Mock
     private TaskRepository taskRepositoryMock;
     @Mock
+    private CommentRepository commentRepository;
+    @Mock
     private TaskValidator taskValidatorMock;
 
     private TaskService taskService;
@@ -32,7 +35,7 @@ class TaskServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        this.taskService = new TaskService(taskRepositoryMock, taskValidatorMock);
+        this.taskService = new TaskService(taskRepositoryMock, taskValidatorMock, commentRepository);
     }
 
     @Test

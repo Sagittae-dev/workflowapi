@@ -46,4 +46,9 @@ public class TaskController {
         List<Task> tasks = taskService.getAllTasks();
         return ResponseEntity.ok(tasks);
     }
+
+    @DeleteMapping("/{taskId}")
+    public void removeTask(@PathVariable Long taskId){
+        taskService.removeTask(taskId);
+    }
 }

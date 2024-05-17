@@ -36,15 +36,14 @@ CommentController {
     }
 
     @PostMapping("/{taskId}")
-    public ResponseEntity<Comment> addCommentToTask(@PathVariable Long taskId, @RequestParam String username, @RequestBody String content) {
+    public ResponseEntity<Comment> addCommentToTask(@PathVariable Long taskId, @RequestParam Long userId, @RequestBody String content) {
         try {
-            Comment comment = commentService.addCommentToTask(taskId, username, content);
+            Comment comment = commentService.addCommentToTask(taskId, userId, content);
             return ResponseEntity.ok(comment);
         } catch (ResourceNotExistException re) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (ValidationException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build(); // TODO write proper logic to adding comments
         }
-
     }
 }
