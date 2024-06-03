@@ -31,7 +31,7 @@ public class CommentService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final CommentValidator commentValidator;
-    private Logger logger = LoggerFactory.getLogger(CommentService.class);
+    private final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
     @Autowired
     public CommentService(CommentRepository commentRepository, TaskRepository taskRepository, UserRepository userRepository, CommentValidator commentValidator) {
