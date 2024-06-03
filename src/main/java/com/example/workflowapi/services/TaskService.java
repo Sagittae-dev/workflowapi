@@ -1,6 +1,6 @@
 package com.example.workflowapi.services;
 
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.repositories.CommentRepository;
@@ -36,7 +36,7 @@ public class TaskService {
 //        return taskRepository.getTasksListByAssignee(user);
 //    }
 
-    public Task getTaskById(Long id) throws ResourceNotExistException {
+    public Task getTaskById(Long id) throws ResourceNotFoundException {
         Optional<Task> optionalTask = taskRepository.findById(id);
         if (optionalTask.isEmpty()) {
             throwResourceNotFoundException(id);
@@ -52,7 +52,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    public Task updateTask(Task task) throws ResourceNotExistException {
+    public Task updateTask(Task task) throws ResourceNotFoundException {
         long taskId = task.getId();
         Optional<Task> taskToEdit = taskRepository.findById(taskId);
         if (taskToEdit.isEmpty()) {
@@ -67,7 +67,7 @@ public class TaskService {
         commentRepository.deleteByTaskId(taskId);
     }
 
-    private void throwResourceNotFoundException(Long id) throws ResourceNotExistException {
-        throw new ResourceNotExistException("Task with id:" + id + " not found.");
+    private void throwResourceNotFoundException(Long id) throws ResourceNotFoundException {
+        throw new ResourceNotFoundException("Task with id:" + id + " not found.");
     }
 }

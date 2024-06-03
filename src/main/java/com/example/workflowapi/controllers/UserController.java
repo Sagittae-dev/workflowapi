@@ -1,6 +1,6 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.model.WorkflowUser;
 import com.example.workflowapi.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ public class UserController {
         try {
             WorkflowUser workflowUser = userService.getUserById(id);
             return ResponseEntity.ok(workflowUser);
-        } catch (ResourceNotExistException e) {
+        } catch (ResourceNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }

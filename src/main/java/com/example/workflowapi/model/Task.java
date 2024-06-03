@@ -3,6 +3,7 @@ package com.example.workflowapi.model;
 import com.example.workflowapi.enums.TaskPriority;
 import com.example.workflowapi.enums.TaskStatus;
 import com.example.workflowapi.enums.TaskType;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +32,8 @@ public class Task {
     private WorkflowUser createdBy;
     @ManyToOne
     private WorkflowUser assignedTo;
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
     private List<Comment> comments;
     private String attachment;
 }

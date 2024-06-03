@@ -1,6 +1,6 @@
 package com.example.workflowapi.services;
 
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Comment;
 import com.example.workflowapi.model.Task;
@@ -10,7 +10,12 @@ import com.example.workflowapi.repositories.TaskRepository;
 import com.example.workflowapi.repositories.UserRepository;
 import com.example.workflowapi.validators.CommentValidator;
 import com.example.workflowapi.validators.ValidationResult;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -26,6 +31,7 @@ public class CommentService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final CommentValidator commentValidator;
+    private final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
     @Autowired
     public CommentService(CommentRepository commentRepository, TaskRepository taskRepository, UserRepository userRepository, CommentValidator commentValidator) {
@@ -44,22 +50,22 @@ public class CommentService {
         }
     }
 
-    public Comment getCommentById(Long id) throws ResourceNotExistException {
+    public Comment getCommentById(Long id) throws ResourceNotFoundException {
         Optional<Comment> comment = commentRepository.findById(id);
         if (comment.isEmpty()) {
-            throw new ResourceNotExistException("Comment with id:" + id + " doesn't exist.");
+            throw new ResourceNotFoundException("Comment with id:" + id + " doesn't exist.");
         }
         return comment.get();
     }
 
-    public Comment addCommentToTask(Long taskId, Long userId, String content) throws ValidationException, ResourceNotExistException {
+    public Comment addCommentToTask(Long taskId, Long userId, String content) throws ValidationException, ResourceNotFoundException {
         WorkflowUser workflowUser = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotExistException("User with id: " + userId + " doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " doesn't exist"));
 
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResourceNotExistException("No task found for id: " + taskId));
+                .orElseThrow(() -> new ResourceNotFoundException("No task found for id: " + taskId));
 
-        Comment comment = createComment(taskId, workflowUser, content);
+        Comment comment = createComment(task, workflowUser, content);
 
         ValidationResult result = commentValidator.validate(comment);
         if (!result.isValid()) {
@@ -74,9 +80,24 @@ public class CommentService {
         return commentRepository.findByContentContainingIgnoreCase(searchString);
     }
 
-    private Comment createComment(Long taskId, WorkflowUser workflowUser, String content) {
+    @Transactional
+    public ResponseEntity<?> removeComment(Long commentId) {
+        try {
+            Optional<Comment> optionalComment = commentRepository.findById(commentId);
+            if (optionalComment.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            commentRepository.deleteById(commentId);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            logger.error("An error occurred while deleting the comment.", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the comment.");
+        }
+    }
+
+    private Comment createComment(Task task, WorkflowUser workflowUser, String content) {
         Comment comment = new Comment();
-        comment.setTaskId(taskId);
+        comment.setTask(task);
         comment.setContent(content);
         comment.setAuthor(workflowUser);
         comment.setLikes(0);
@@ -84,4 +105,6 @@ public class CommentService {
         comment.setCreationDate(LocalDate.now());
         return comment;
     }
+
+
 }

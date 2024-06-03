@@ -1,6 +1,6 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Comment;
 import com.example.workflowapi.services.CommentService;
@@ -25,8 +25,8 @@ CommentController {
 
     @GetMapping("/{taskId}")
     public ResponseEntity<List<Comment>> getAllCommentsForTask(@PathVariable Long taskId) {
-            List<Comment> commentsList = commentService.getAllCommentsForTask(taskId);
-            return ResponseEntity.ok(commentsList);
+        List<Comment> commentsList = commentService.getAllCommentsForTask(taskId);
+        return ResponseEntity.ok(commentsList);
     }
 
     @GetMapping("/search")
@@ -40,10 +40,15 @@ CommentController {
         try {
             Comment comment = commentService.addCommentToTask(taskId, userId, content);
             return ResponseEntity.ok(comment);
-        } catch (ResourceNotExistException re) {
+        } catch (ResourceNotFoundException re) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (ValidationException e) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build(); // TODO write proper logic to adding comments
         }
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<?> removeComment(@PathVariable Long commentId) {
+        return commentService.removeComment(commentId);
     }
 }

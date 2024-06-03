@@ -1,6 +1,6 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.services.TaskService;
@@ -36,7 +36,7 @@ public class TaskController {
         try {
             Task task = taskService.getTaskById(id);
             return ResponseEntity.ok(task);
-        } catch (ResourceNotExistException re) {
+        } catch (ResourceNotFoundException re) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
@@ -48,7 +48,8 @@ public class TaskController {
     }
 
     @DeleteMapping("/{taskId}")
-    public void removeTask(@PathVariable Long taskId){
+    public ResponseEntity<Void> removeTask(@PathVariable Long taskId) {
         taskService.removeTask(taskId);
+        return ResponseEntity.noContent().build();
     }
 }
