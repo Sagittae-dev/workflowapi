@@ -1,7 +1,7 @@
 package com.example.workflowapi.services;
 
 import com.example.workflowapi.enums.TaskType;
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.repositories.CommentRepository;
@@ -65,7 +65,7 @@ class TaskServiceTest {
     }
 
     @Test
-    void getTaskById_Success() throws ResourceNotExistException {
+    void getTaskById_Success() throws ResourceNotFoundException {
         Long taskId = 1L;
         Task task = new Task();
         task.setId(taskId);
@@ -87,7 +87,7 @@ class TaskServiceTest {
     void getTaskById_ResourceNotExist() {
         when(taskRepositoryMock.findById(anyLong())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotExistException.class, () -> taskService.getTaskById(1L));
+        assertThrows(ResourceNotFoundException.class, () -> taskService.getTaskById(1L));
     }
 
 

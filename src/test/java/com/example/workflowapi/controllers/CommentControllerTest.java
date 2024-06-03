@@ -1,6 +1,6 @@
 package com.example.workflowapi.controllers;
 
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Comment;
 import com.example.workflowapi.services.CommentService;
@@ -71,7 +71,7 @@ class CommentControllerTest {
     }
 
     @Test
-    void addCommentToTask_Success() throws ValidationException, ResourceNotExistException {
+    void addCommentToTask_Success() throws ValidationException, ResourceNotFoundException {
         Comment comment = new Comment();
         when(commentService.addCommentToTask(anyLong(), anyLong(), anyString())).thenReturn(comment);
         ResponseEntity<Comment> response = commentController.addCommentToTask(1L, 2L, "abcd");
@@ -80,15 +80,15 @@ class CommentControllerTest {
     }
 
     @Test
-    void addCommentToTask_ResourceNotExist() throws ValidationException, ResourceNotExistException {
-        when(commentService.addCommentToTask(anyLong(), anyLong(), anyString())).thenThrow(new ResourceNotExistException("abc"));
+    void addCommentToTask_ResourceNotExist() throws ValidationException, ResourceNotFoundException {
+        when(commentService.addCommentToTask(anyLong(), anyLong(), anyString())).thenThrow(new ResourceNotFoundException("abc"));
         ResponseEntity<Comment> response = commentController.addCommentToTask(1L, 2L, "abcd");
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
-    void addCommentToTask_NotValid() throws ValidationException, ResourceNotExistException {
+    void addCommentToTask_NotValid() throws ValidationException, ResourceNotFoundException {
         when(commentService.addCommentToTask(anyLong(), anyLong(), anyString())).thenThrow(new ValidationException(Collections.singletonList("abc")));
         ResponseEntity<Comment> response = commentController.addCommentToTask(1L, 2L, "abcd");
 

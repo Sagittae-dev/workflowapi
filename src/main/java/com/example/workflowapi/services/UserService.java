@@ -1,6 +1,6 @@
 package com.example.workflowapi.services;
 
-import com.example.workflowapi.exceptions.ResourceNotExistException;
+import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.model.WorkflowUser;
 import com.example.workflowapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +23,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public WorkflowUser getUserById(Long id) throws ResourceNotExistException {
+    public WorkflowUser getUserById(Long id) throws ResourceNotFoundException {
         Optional<WorkflowUser> optionalUser = userRepository.findById(id);
         if (optionalUser.isEmpty()) {
-            throw new ResourceNotExistException("User with id: " + id + " doesn't exist");
+            throw new ResourceNotFoundException("User with id: " + id + " doesn't exist");
         }
         return optionalUser.get();
     }
@@ -35,10 +35,10 @@ public class UserService {
         return userRepository.save(workflowUser);
     }
 
-    public WorkflowUser findUserByUsername(String username) throws ResourceNotExistException {
+    public WorkflowUser findUserByUsername(String username) throws ResourceNotFoundException {
         Optional<WorkflowUser> userOptional = userRepository.findByUsername(username);
         if (userOptional.isEmpty()) {
-            throw new ResourceNotExistException("There is no user with this username");
+            throw new ResourceNotFoundException("There is no user with this username");
         }
         return userOptional.get();
     }
