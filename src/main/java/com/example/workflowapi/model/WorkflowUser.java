@@ -16,6 +16,8 @@ public class WorkflowUser {
     private Long id;
     @NotBlank
     private String username;
+    @NotBlank
+    private String password;
     @Email
     private String email;
     private Boolean isActive;

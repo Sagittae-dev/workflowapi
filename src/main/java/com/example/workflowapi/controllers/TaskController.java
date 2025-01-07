@@ -44,7 +44,7 @@ public class TaskController {
         Task updatedTask = taskService.updateTask(taskId, taskDetails);
         return ResponseEntity.ok(updatedTask);
     }
-    @PutMapping("/{taskId}/assign")
+    @PatchMapping("/{taskId}/assign")
     public ResponseEntity<Task> assignTask(@PathVariable Long taskId, @RequestParam Long userId) throws ResourceNotFoundException {
         Task task = taskService.assignTask(taskId, userId);
         return ResponseEntity.ok(task);

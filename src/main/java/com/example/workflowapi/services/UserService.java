@@ -2,9 +2,11 @@ package com.example.workflowapi.services;
 
 import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.UserAlreadyExistsException;
+import com.example.workflowapi.model.Task;
 import com.example.workflowapi.model.WorkflowUser;
 import com.example.workflowapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +16,12 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<WorkflowUser> getAllUsers() {
@@ -50,5 +54,18 @@ public class UserService {
             throw new ResourceNotFoundException("There is no user with this username");
         }
         return userOptional.get();
+    }
+
+    public List<Task> getTasksForUser(Long id) throws ResourceNotFoundException {
+        WorkflowUser user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found."));
+        return user.getAssignedTasks();
+    }
+
+    public WorkflowUser changePassword(Long id, String password) throws ResourceNotFoundException {
+        WorkflowUser user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + id + " not found"));
+        user.setPassword(passwordEncoder.encode(password));
+        return userRepository.save(user);
     }
 }

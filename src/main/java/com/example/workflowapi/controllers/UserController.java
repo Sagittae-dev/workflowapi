@@ -2,6 +2,7 @@ package com.example.workflowapi.controllers;
 
 import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.UserAlreadyExistsException;
+import com.example.workflowapi.model.Task;
 import com.example.workflowapi.model.WorkflowUser;
 import com.example.workflowapi.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -35,9 +36,21 @@ public class UserController {
         }
     }
 
+    @GetMapping("/{id}/tasks")
+    public ResponseEntity<List<Task>> getTasksForUser(@PathVariable Long id) throws ResourceNotFoundException {
+        List<Task> tasks = userService.getTasksForUser(id);
+        return ResponseEntity.ok(tasks);
+    }
+
     @PostMapping
     public ResponseEntity<WorkflowUser> createNewUser(@RequestBody WorkflowUser workflowUser) throws UserAlreadyExistsException {
         WorkflowUser createdWorkflowUser = userService.addUser(workflowUser);
         return ResponseEntity.ok(createdWorkflowUser);
+    }
+
+    @PatchMapping("/{id}/password")
+    public ResponseEntity<WorkflowUser> changePassword(@PathVariable Long id, @RequestBody String password) throws ResourceNotFoundException {
+        WorkflowUser updatedUser = userService.changePassword(id, password);
+        return ResponseEntity.ok(updatedUser);
     }
 }

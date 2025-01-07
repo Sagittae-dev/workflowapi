@@ -97,6 +97,7 @@ public class TaskService {
         WorkflowUser user = userRepository.findById(userId)
                 .orElseThrow( () -> new ResourceNotFoundException("User with id: " + userId + " not found."));
         task.setAssignedTo(user);
+        user.getAssignedTasks().add(task);
 
         return taskRepository.save(task);
     }
