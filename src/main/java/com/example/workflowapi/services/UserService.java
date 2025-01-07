@@ -1,6 +1,7 @@
 package com.example.workflowapi.services;
 
 import com.example.workflowapi.exceptions.ResourceNotFoundException;
+import com.example.workflowapi.exceptions.UserAlreadyExistsException;
 import com.example.workflowapi.model.WorkflowUser;
 import com.example.workflowapi.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,15 @@ public class UserService {
         return optionalUser.get();
     }
 
-    public WorkflowUser addUser(WorkflowUser workflowUser) {
+    public WorkflowUser addUser(WorkflowUser workflowUser) throws UserAlreadyExistsException {
+        String username = workflowUser.getUsername();
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new UserAlreadyExistsException("User with this username already exists");
+        }
+        String email = workflowUser.getEmail();
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new UserAlreadyExistsException("User with this email already exists");
+        }
         return userRepository.save(workflowUser);
     }
 

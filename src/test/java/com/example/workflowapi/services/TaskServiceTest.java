@@ -6,6 +6,7 @@ import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
 import com.example.workflowapi.repositories.CommentRepository;
 import com.example.workflowapi.repositories.TaskRepository;
+import com.example.workflowapi.repositories.UserRepository;
 import com.example.workflowapi.validators.TaskValidator;
 import com.example.workflowapi.validators.ValidationResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,13 +30,15 @@ class TaskServiceTest {
     private CommentRepository commentRepository;
     @Mock
     private TaskValidator taskValidatorMock;
+    @Mock
+    private UserRepository userRepository;
 
     private TaskService taskService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        this.taskService = new TaskService(taskRepositoryMock, taskValidatorMock, commentRepository);
+        this.taskService = new TaskService(taskRepositoryMock, taskValidatorMock, commentRepository, userRepository);
     }
 
     @Test
@@ -92,7 +95,7 @@ class TaskServiceTest {
 
 
     @Test
-    void saveTask_Success() throws ValidationException {
+    void createTask_Success() throws ValidationException {
         Task task = new Task();
         task.setName("task1");
         task.setTaskType(TaskType.BUG);
@@ -105,7 +108,7 @@ class TaskServiceTest {
 
         when(taskRepositoryMock.save(task)).thenReturn(task);
 
-        Task savedTask = taskService.saveTask(task);
+        Task savedTask = taskService.createTask(task);
         assertEquals(task.getId(), savedTask.getId());
         assertEquals(task.getName(), savedTask.getName());
         assertEquals(task.getTaskType(), savedTask.getTaskType());
@@ -113,7 +116,7 @@ class TaskServiceTest {
     }
 
     @Test
-    public void testSaveTask_ValidationFailure() {
+    public void testCreateTask_ValidationFailure() {
         Task task = new Task();
         task.setId(1L);
         task.setDescription("This is a test task");
@@ -127,7 +130,7 @@ class TaskServiceTest {
         when(taskRepositoryMock.save(task)).thenReturn(task);
         when(taskValidatorMock.validate(task)).thenReturn(validationResult);
 
-        assertThrows(ValidationException.class, () -> taskService.saveTask(task));
+        assertThrows(ValidationException.class, () -> taskService.createTask(task));
     }
 
     @Test

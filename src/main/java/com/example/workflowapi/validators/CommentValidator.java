@@ -26,10 +26,6 @@ public class CommentValidator implements Validator<Comment> {
         if (comment.getCreationDate() == null || comment.getCreationDate().isAfter(LocalDate.now())) {
             errors.add("Invalid creation date.");
         }
-
-        if (comment.getUnlikes() == null || comment.getLikes() == null || comment.getLikes() < 0 || comment.getUnlikes() < 0) {
-            errors.add("Comment likes and unlikes can't be less than 0 and null.");
-        }
         validationResult.setValid(errors.isEmpty());
         validationResult.setErrors(errors);
         return validationResult;

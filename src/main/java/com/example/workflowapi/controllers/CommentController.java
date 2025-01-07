@@ -1,5 +1,7 @@
 package com.example.workflowapi.controllers;
 
+import com.example.workflowapi.exceptions.AlreadyLikedException;
+import com.example.workflowapi.exceptions.NotLikedException;
 import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Comment;
@@ -13,8 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/comments")
-public class
-CommentController {
+public class CommentController {
 
     private final CommentService commentService;
 
@@ -30,8 +31,8 @@ CommentController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Comment>> searchCommentsByContent(@RequestParam String searchString) {
-        List<Comment> commentsList = commentService.searchCommentsByContent(searchString);
+    public ResponseEntity<List<Comment>> searchCommentsInTaskByContent(@RequestParam Long taskId, @RequestBody String searchString) throws ResourceNotFoundException, IllegalArgumentException {
+        List<Comment> commentsList = commentService.searchCommentsInTaskByContent(taskId, searchString);
         return ResponseEntity.ok(commentsList);
     }
 
@@ -48,7 +49,20 @@ CommentController {
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<?> removeComment(@PathVariable Long commentId) {
-        return commentService.removeComment(commentId);
+    public ResponseEntity<?> removeComment(@PathVariable Long commentId) throws ResourceNotFoundException {
+        commentService.removeComment(commentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{commentId}/like")
+    public ResponseEntity<Comment> likeComment(@PathVariable Long commentId, @RequestParam Long userId) throws ResourceNotFoundException, AlreadyLikedException {
+            Comment comment = commentService.likeComment(commentId, userId);
+            return ResponseEntity.ok(comment);
+    }
+
+    @PutMapping("/{commentId}/unlike")
+    public ResponseEntity<Comment> unlikeComment(@PathVariable Long commentId, @RequestParam Long userId) throws ResourceNotFoundException, NotLikedException {
+            Comment comment = commentService.unlikeComment(commentId, userId);
+            return ResponseEntity.ok(comment);
     }
 }

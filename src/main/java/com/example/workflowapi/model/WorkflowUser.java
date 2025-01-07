@@ -2,6 +2,7 @@ package com.example.workflowapi.model;
 
 import com.example.workflowapi.validators.Email;
 import com.example.workflowapi.validators.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class WorkflowUser {
     @OneToMany(mappedBy = "createdBy")
     private List<Task> createdTasks;
     @OneToMany(mappedBy = "assignedTo")
+    @JsonIgnoreProperties("assignedTo")
     private List<Task> assignedTasks;
     @OneToMany/*(mappedBy = "author")*/
     private List<Comment> comments;

@@ -22,29 +22,32 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createTask(@RequestBody Task task) {
-        try {
-            Task createdTask = taskService.saveTask(task);
-            return ResponseEntity.ok(createdTask);
-        } catch (ValidationException ve) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(ve.getErrors());
-        }
+    public ResponseEntity<Task> createTask(@RequestBody Task task) throws ValidationException {
+        Task createdTask = taskService.createTask(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
-        try {
-            Task task = taskService.getTaskById(id);
-            return ResponseEntity.ok(task);
-        } catch (ResourceNotFoundException re) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) throws ResourceNotFoundException {
+        Task task = taskService.getTaskById(id);
+        return ResponseEntity.ok(task);
     }
 
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks() {
         List<Task> tasks = taskService.getAllTasks();
         return ResponseEntity.ok(tasks);
+    }
+
+    @PatchMapping("/{taskId}")
+    public ResponseEntity<Task> updateTask(@PathVariable Long taskId, @RequestBody Task taskDetails) throws ResourceNotFoundException {
+        Task updatedTask = taskService.updateTask(taskId, taskDetails);
+        return ResponseEntity.ok(updatedTask);
+    }
+    @PutMapping("/{taskId}/assign")
+    public ResponseEntity<Task> assignTask(@PathVariable Long taskId, @RequestParam Long userId) throws ResourceNotFoundException {
+        Task task = taskService.assignTask(taskId, userId);
+        return ResponseEntity.ok(task);
     }
 
     @DeleteMapping("/{taskId}")

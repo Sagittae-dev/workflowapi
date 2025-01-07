@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<WorkflowUser, Long> {
     Optional<WorkflowUser> findByUsername(String username);
+    Optional<WorkflowUser> findByEmail(String email);
 }

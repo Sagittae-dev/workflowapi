@@ -1,5 +1,7 @@
 package com.example.workflowapi.services;
 
+import com.example.workflowapi.exceptions.AlreadyLikedException;
+import com.example.workflowapi.exceptions.NotLikedException;
 import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Comment;
@@ -14,15 +16,10 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CommentService {
@@ -51,11 +48,8 @@ public class CommentService {
     }
 
     public Comment getCommentById(Long id) throws ResourceNotFoundException {
-        Optional<Comment> comment = commentRepository.findById(id);
-        if (comment.isEmpty()) {
-            throw new ResourceNotFoundException("Comment with id:" + id + " doesn't exist.");
-        }
-        return comment.get();
+        return commentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment with id:" + id + " doesn't exist."));
     }
 
     public Comment addCommentToTask(Long taskId, Long userId, String content) throws ValidationException, ResourceNotFoundException {
@@ -76,23 +70,25 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
-    public List<Comment> searchCommentsByContent(String searchString) {
-        return commentRepository.findByContentContainingIgnoreCase(searchString);
+    public List<Comment> searchCommentsInTaskByContent(Long taskId, String searchString) throws ResourceNotFoundException, IllegalArgumentException {
+        if (searchString == null || searchString.isBlank()) {
+            throw new IllegalArgumentException("Search string cannot be null or empty");
+        }
+        String lowerCaseSearchString = searchString.toLowerCase(Locale.ROOT);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task with id: " + taskId + " doesn't exist."));
+        return task.getComments()
+                .stream()
+                .filter(comment -> comment.getContent().toLowerCase().contains(lowerCaseSearchString))
+                .toList();
+
     }
 
     @Transactional
-    public ResponseEntity<?> removeComment(Long commentId) {
-        try {
-            Optional<Comment> optionalComment = commentRepository.findById(commentId);
-            if (optionalComment.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-            }
-            commentRepository.deleteById(commentId);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
-            logger.error("An error occurred while deleting the comment.", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the comment.");
-        }
+    public void removeComment(Long commentId) throws ResourceNotFoundException {
+        commentRepository.findById(commentId)
+                .orElseThrow( () -> new ResourceNotFoundException("Comment with id: " + commentId + " doesn't exist."));
+        commentRepository.deleteById(commentId);
     }
 
     private Comment createComment(Task task, WorkflowUser workflowUser, String content) {
@@ -101,10 +97,33 @@ public class CommentService {
         comment.setContent(content);
         comment.setAuthor(workflowUser);
         comment.setLikes(0);
-        comment.setUnlikes(0);
         comment.setCreationDate(LocalDate.now());
         return comment;
     }
 
+    @Transactional
+    public Comment likeComment(Long commentId, Long userId) throws ResourceNotFoundException, AlreadyLikedException {
+        Comment comment = getCommentById(commentId);
+        Set<Long> likedBy = comment.getLikedBy();
+        if(likedBy.contains(userId)) {
+            throw new AlreadyLikedException("You have already liked this comment.");
+        }
+        comment.setLikes(comment.getLikes() + 1);
+        likedBy.add(userId);
+        comment.setLikedBy(likedBy);
+        return commentRepository.save(comment);
+    }
 
+    @Transactional
+    public Comment unlikeComment(Long commentId, Long userId) throws ResourceNotFoundException, NotLikedException {
+        Comment comment = getCommentById(commentId);
+        Set<Long> likedBy = comment.getLikedBy();
+        if(!likedBy.contains(userId)) {
+            throw new NotLikedException("You have not liked this comment.");
+        }
+        comment.setLikes(comment.getLikes() - 1);
+        likedBy.remove(userId);
+        comment.setLikedBy(likedBy);
+        return commentRepository.save(comment);
+    }
 }

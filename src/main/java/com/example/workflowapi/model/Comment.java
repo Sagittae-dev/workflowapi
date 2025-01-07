@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Data
@@ -22,6 +24,7 @@ public class Comment {
     @JsonBackReference
     private Task task;
     private Integer likes;
-    private Integer unlikes;
+    @ElementCollection
+    private Set <Long> likedBy = new HashSet<>();
     private LocalDate creationDate;
 }

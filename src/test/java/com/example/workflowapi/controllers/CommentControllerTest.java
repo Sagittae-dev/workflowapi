@@ -61,10 +61,10 @@ class CommentControllerTest {
     }
 
     @Test
-    void searchCommentsByContent_Success() {
+    void searchCommentsByContent_Success() throws ResourceNotFoundException {
         List<Comment> comments = List.of(new Comment(), new Comment());
-        when(commentService.searchCommentsByContent("abc")).thenReturn(comments);
-        ResponseEntity<List<Comment>> response = commentController.searchCommentsByContent("abc");
+        when(commentService.searchCommentsInTaskByContent(1L, "abc")).thenReturn(comments);
+        ResponseEntity<List<Comment>> response = commentController.searchCommentsInTaskByContent(1L, "abc");
 
         assertEquals(2, Objects.requireNonNull(response.getBody()).size());
         assertEquals(HttpStatus.OK, response.getStatusCode());
