@@ -50,8 +50,9 @@ public class GlobalExceptionHandler {
         body.put("error", "Bad Request");
         body.put("message", e.getMessage());
         body.put("path", request.getDescription(false));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(AlreadyLikedException.class)
     public ResponseEntity<Object> handleAlreadyLikedException(AlreadyLikedException e, WebRequest request) {
         logger.error("AlreadyLikedException: {}", e.getMessage());

@@ -25,7 +25,7 @@ public class CommentController {
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<List<Comment>> getAllCommentsForTask(@PathVariable Long taskId) {
+    public ResponseEntity<List<Comment>> getAllCommentsForTask(@PathVariable Long taskId) throws ResourceNotFoundException {
         List<Comment> commentsList = commentService.getAllCommentsForTask(taskId);
         return ResponseEntity.ok(commentsList);
     }
@@ -54,13 +54,13 @@ public class CommentController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{commentId}/like")
+    @PatchMapping("/{commentId}/like")
     public ResponseEntity<Comment> likeComment(@PathVariable Long commentId, @RequestParam Long userId) throws ResourceNotFoundException, AlreadyLikedException {
             Comment comment = commentService.likeComment(commentId, userId);
             return ResponseEntity.ok(comment);
     }
 
-    @PutMapping("/{commentId}/unlike")
+    @PatchMapping("/{commentId}/unlike")
     public ResponseEntity<Comment> unlikeComment(@PathVariable Long commentId, @RequestParam Long userId) throws ResourceNotFoundException, NotLikedException {
             Comment comment = commentService.unlikeComment(commentId, userId);
             return ResponseEntity.ok(comment);

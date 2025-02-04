@@ -38,13 +38,10 @@ public class CommentService {
         this.commentValidator = commentValidator;
     }
 
-    public List<Comment> getAllCommentsForTask(Long taskId) {
-        try {
-            Task task = taskRepository.findById(taskId).orElseThrow();
-            return task.getComments();
-        } catch (NoSuchElementException re) {
-            return Collections.emptyList();
-        }
+    public List<Comment> getAllCommentsForTask(Long taskId) throws ResourceNotFoundException {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow( () -> new ResourceNotFoundException("Task with id: " + taskId + " doesn't exist."));
+        return task.getComments();
     }
 
     public Comment getCommentById(Long id) throws ResourceNotFoundException {
@@ -52,21 +49,33 @@ public class CommentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Comment with id:" + id + " doesn't exist."));
     }
 
+    @Transactional
     public Comment addCommentToTask(Long taskId, Long userId, String content) throws ValidationException, ResourceNotFoundException {
+        // Validate input parameters
+        if (taskId == null || userId == null || content == null || content.isBlank()) {
+            throw new IllegalArgumentException("Task ID, User ID, and content must not be null or empty");
+        }
+
+        // Retrieve user and task
         WorkflowUser workflowUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " doesn't exist"));
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("No task found for id: " + taskId));
-
+        // Create and validate comment
         Comment comment = createComment(task, workflowUser, content);
-
         ValidationResult result = commentValidator.validate(comment);
         if (!result.isValid()) {
             throw new ValidationException(result.getErrors());
         }
+
+        // Add comment to task
+        if (task.getComments() == null) {
+            task.setComments(new ArrayList<>());
+        }
         task.getComments().add(comment);
 
+        // Save and return comment
         return commentRepository.save(comment);
     }
 

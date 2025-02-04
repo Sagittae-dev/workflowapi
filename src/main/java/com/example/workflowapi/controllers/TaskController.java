@@ -22,7 +22,7 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<Task> createTask(@RequestBody Task task) throws ValidationException {
+    public ResponseEntity<Task> createTask(@RequestBody Task task) throws ValidationException, ResourceNotFoundException {
         Task createdTask = taskService.createTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }

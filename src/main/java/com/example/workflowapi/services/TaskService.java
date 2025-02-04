@@ -1,5 +1,6 @@
 package com.example.workflowapi.services;
 
+import com.example.workflowapi.cofiguration.SecurityUtils;
 import com.example.workflowapi.exceptions.ResourceNotFoundException;
 import com.example.workflowapi.exceptions.ValidationException;
 import com.example.workflowapi.model.Task;
@@ -39,15 +40,14 @@ public class TaskService {
     }
 
     public Task getTaskById(Long id) throws ResourceNotFoundException {
-        Optional<Task> optionalTask = taskRepository.findById(id);
-        if (optionalTask.isEmpty()) {
-            throwResourceNotFoundException(id);
-        }
-        return optionalTask.get();
+        return taskRepository.findById(id)
+                .orElseThrow( () -> new ResourceNotFoundException("Task with id: " + id + " not found."));
     }
 
-    public Task createTask(Task task) throws ValidationException {
+    public Task createTask(Task task) throws ValidationException, ResourceNotFoundException {
         task.setCreationDate(LocalDateTime.now());
+        task.setCreatedBy(userRepository.findByUsername(SecurityUtils.getAuthenticatedUsername())
+                .orElseThrow( () -> new ResourceNotFoundException("User not found.")));
         ValidationResult validationResult = taskValidator.validate(task);
         if (!validationResult.isValid()) {
             throw new ValidationException(validationResult.getErrors());
